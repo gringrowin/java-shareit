@@ -15,12 +15,12 @@ import javax.validation.constraints.Null;
 @AllArgsConstructor
 public class UserDto {
 
-    @Null(groups = MarkerUserDto.onCreate.class)
+    @Null(groups = MarkerUserDto.OnCreate.class)
     private Long id;
-    @NotNull(groups = MarkerUserDto.onCreate.class)
+    @NotNull(groups = MarkerUserDto.OnCreate.class)
     private String name;
-    @NotNull(groups = MarkerUserDto.onCreate.class)
-    @Email(groups = MarkerUserDto.onCreate.class, message = "Неправильный формат электронной почты")
-    @Email(groups = MarkerUserDto.onUpdate.class, message = "Неправильный формат электронной почты")
+    @NotNull(groups = MarkerUserDto.OnCreate.class)
+    @Email(groups = MarkerUserDto.OnCreate.class, message = "Неправильный формат электронной почты")
+    @Email(groups = MarkerUserDto.OnUpdate.class, message = "Неправильный формат электронной почты")
     private String email;
 }

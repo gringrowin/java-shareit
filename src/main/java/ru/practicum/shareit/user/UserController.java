@@ -33,7 +33,7 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto create(@Validated(MarkerUserDto.onCreate.class) @RequestBody UserDto userDto) {
+    public UserDto create(@Validated(MarkerUserDto.OnCreate.class) @RequestBody UserDto userDto) {
         log.info("UserController.create: {} - Started", userDto);
         userDto = userService.create(userDto);
         log.info("UserController.create: {} - Finished", userDto);
@@ -49,7 +49,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public Long delete (@PathVariable("userId") Long id) {
+    public Long delete(@PathVariable("userId") Long id) {
         log.info("UserController.delete: {} - Started", id);
         userService.deleteUser(id);
         log.info("UserController.delete: {} - Finished", id);

@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.request.ItemRequest;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -20,18 +19,18 @@ import javax.validation.constraints.Null;
 @NoArgsConstructor
 public class ItemDto {
 
-    @Null(groups = MarkerItemDto.onCreate.class)
+    @Null(groups = MarkerItemDto.OnCreate.class)
     private Long id;
 
-    @NotNull(groups = MarkerItemDto.onCreate.class)
-    @NotBlank(groups = MarkerItemDto.onCreate.class)
+    @NotNull(groups = MarkerItemDto.OnCreate.class)
+    @NotBlank(groups = MarkerItemDto.OnCreate.class)
     private String name;
 
-    @NotNull(groups = MarkerItemDto.onCreate.class)
-    @NotBlank(groups = MarkerItemDto.onCreate.class)
+    @NotNull(groups = MarkerItemDto.OnCreate.class)
+    @NotBlank(groups = MarkerItemDto.OnCreate.class)
     private String description;
 
-    @NotNull(groups = MarkerItemDto.onCreate.class)
+    @NotNull(groups = MarkerItemDto.OnCreate.class)
     private Boolean available;
 
     @JsonIgnore

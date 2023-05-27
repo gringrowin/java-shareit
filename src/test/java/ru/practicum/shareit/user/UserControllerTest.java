@@ -9,7 +9,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.exception.UserNotFoundException;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,7 +31,7 @@ class UserControllerTest {
 
     private UserDto testUserDto() {
         return new UserDto(
-                1L, "name" , "mail@mail.com");
+                1L, "name", "mail@mail.com");
     }
 
     @SneakyThrows

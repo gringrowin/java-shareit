@@ -5,13 +5,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.MarkerItemDto;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.service.UserServiceImpl;
 
-import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -38,7 +33,7 @@ public class ItemController {
 
     @PostMapping
     public ItemDto create(@RequestHeader("X-Sharer-User-Id") Long userId,
-                          @Validated(MarkerItemDto.onCreate.class) @RequestBody ItemDto itemDto) {
+                          @Validated(MarkerItemDto.OnCreate.class) @RequestBody ItemDto itemDto) {
         log.info("ItemController.create: {} - Started", itemDto);
         itemDto = itemService.create(userId, itemDto);
         log.info("ItemController.create: {} - Finished", itemDto);
@@ -48,7 +43,7 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ItemDto update(@RequestHeader("X-Sharer-User-Id") Long userId,
                           @PathVariable("itemId") Long itemId,
-                          @Validated(MarkerItemDto.onUpdate.class) @RequestBody ItemDto itemDto) {
+                          @Validated(MarkerItemDto.OnUpdate.class) @RequestBody ItemDto itemDto) {
         log.info("ItemController.update: {} {} - Started", itemId, itemDto);
         itemDto = itemService.update(userId, itemId, itemDto);
         log.info("ItemController.update: {} - Finished", itemDto);
@@ -56,7 +51,7 @@ public class ItemController {
     }
 
     @DeleteMapping("/{itemId}")
-    public Long delete (@PathVariable("itemId") Long id) {
+    public Long delete(@PathVariable("itemId") Long id) {
         log.info("ItemController.delete: {} - Started", id);
         itemService.deleteItem(id);
         log.info("ItemController.delete: {} - Finished", id);

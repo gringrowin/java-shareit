@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService {
                 .filter(e -> e.equals(email))
                 .findAny();
 
-        if(emails.isPresent()) {
+        if (emails.isPresent()) {
             throw new DuplicateEmailException("Такой Email уже существует");
         }
     }
