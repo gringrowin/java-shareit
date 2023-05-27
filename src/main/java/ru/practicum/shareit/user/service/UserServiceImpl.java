@@ -11,6 +11,7 @@ import ru.practicum.shareit.user.exception.DuplicateEmailException;
 import ru.practicum.shareit.user.storage.UserStorage;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,10 +27,12 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public List<User> getAll() {
+    public List<UserDto> getAll() {
         List<User> users = userStorage.getAll();
         log.info("UserService.getAll: {}", users.size());
-        return users;
+        return users.stream()
+                .map(UserMapper::toUserDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -44,10 +47,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto create(User user) {
-        log.info("UserService.create: {} - Started", user);
-        checkEmailUser(user.getEmail());
-        user = userStorage.add(user);
+    public UserDto create(UserDto userDto) {
+        log.info("UserService.create: {} - Started", userDto);
+        checkEmailUser(userDto.getEmail());
+        User user = UserMapper.toUser(userDto);
+        user =  userStorage.add(user);
         log.info("UserService.create: {} - Finished", user);
         return UserMapper.toUserDto(user);
     }
@@ -81,12 +85,13 @@ public class UserServiceImpl implements UserService {
     }
 
     private void checkEmailUser(String email) {
-        List<String> emails = getAll()
+        Optional<String> emails = getAll()
                 .stream()
-                .map(User::getEmail)
-                .collect(Collectors.toList());
+                .map(UserDto::getEmail)
+                .filter(e -> e.equals(email))
+                .findAny();
 
-        if (emails.contains(email)) {
+        if(emails.isPresent()) {
             throw new DuplicateEmailException("Такой Email уже существует");
         }
     }

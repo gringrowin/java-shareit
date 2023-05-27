@@ -1,12 +1,14 @@
 package ru.practicum.shareit.user;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.dto.MarkerUserDto;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * TODO Sprint add-controllers.
@@ -31,9 +33,9 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto create(@Valid @RequestBody User user) {
-        log.info("UserController.create: {} - Started", user);
-        UserDto userDto = userService.create(user);
+    public UserDto create(@Validated(MarkerUserDto.onCreate.class) @RequestBody UserDto userDto) {
+        log.info("UserController.create: {} - Started", userDto);
+        userDto = userService.create(userDto);
         log.info("UserController.create: {} - Finished", userDto);
         return userDto;
     }
@@ -52,6 +54,14 @@ public class UserController {
         userService.deleteUser(id);
         log.info("UserController.delete: {} - Finished", id);
         return id;
+    }
+
+    @GetMapping
+    public List<UserDto> getAll() {
+        log.info("UserController.getAll: - Started");
+        List<UserDto> users = userService.getAll();
+        log.info("UserController.getAll: {} - Finished", users.size());
+        return users;
     }
 
 }

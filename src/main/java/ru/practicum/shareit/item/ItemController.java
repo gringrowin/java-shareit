@@ -1,8 +1,10 @@
 package ru.practicum.shareit.item;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.MarkerItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -10,6 +12,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * TODO Sprint add-controllers.
@@ -35,9 +38,9 @@ public class ItemController {
 
     @PostMapping
     public ItemDto create(@RequestHeader("X-Sharer-User-Id") Long userId,
-                          @Valid @RequestBody Item item) {
-        log.info("ItemController.create: {} - Started", item);
-        ItemDto itemDto = itemService.create(userId, item);
+                          @Validated(MarkerItemDto.onCreate.class) @RequestBody ItemDto itemDto) {
+        log.info("ItemController.create: {} - Started", itemDto);
+        itemDto = itemService.create(userId, itemDto);
         log.info("ItemController.create: {} - Finished", itemDto);
         return itemDto;
     }
@@ -45,7 +48,7 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ItemDto update(@RequestHeader("X-Sharer-User-Id") Long userId,
                           @PathVariable("itemId") Long itemId,
-                          @Valid @RequestBody ItemDto itemDto) {
+                          @Validated(MarkerItemDto.onUpdate.class) @RequestBody ItemDto itemDto) {
         log.info("ItemController.update: {} {} - Started", itemId, itemDto);
         itemDto = itemService.update(userId, itemId, itemDto);
         log.info("ItemController.update: {} - Finished", itemDto);
@@ -58,5 +61,21 @@ public class ItemController {
         itemService.deleteItem(id);
         log.info("ItemController.delete: {} - Finished", id);
         return id;
+    }
+
+    @GetMapping
+    public List<ItemDto> getItemsByUserId(@RequestHeader("X-Sharer-User-Id") Long userId) {
+        log.info("ItemController.delete: {} - Started", userId);
+        List<ItemDto> items = itemService.getItemsByUserId(userId);
+        log.info("ItemController.delete: {} - Finished", items.size());
+        return items;
+    }
+
+    @GetMapping("/search")
+    public List<ItemDto> searchItems(@RequestParam(name = "text") String text) {
+        log.info("ItemController.searchItems: {} - Started", text);
+        List<ItemDto> items = itemService.searchItems(text);
+        log.info("ItemController.searchItems: {} - Finished", items.size());
+        return items;
     }
 }
