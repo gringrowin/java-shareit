@@ -7,11 +7,9 @@ import ru.practicum.shareit.user.exception.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
-import ru.practicum.shareit.user.exception.DuplicateEmailException;
 import ru.practicum.shareit.user.storage.UserStorage;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,9 +47,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto create(UserDto userDto) {
         log.info("UserService.create: {} - Started", userDto);
-        checkEmailUser(userDto.getEmail());
         User user = UserMapper.toUser(userDto);
-        user =  userStorage.add(user);
+        user = userStorage.add(user);
         log.info("UserService.create: {} - Finished", user);
         return UserMapper.toUserDto(user);
     }
@@ -59,20 +56,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto update(Long id, UserDto userDto) {
         log.info("UserService.update: {} {} - Started", id, userDto);
-
-        User user = userStorage.getUser(id);
-
-        if (userDto.getName() != null) {
-            user.setName(userDto.getName());
-        }
-        if (userDto.getEmail() != null
-                && !userDto.getEmail().equals(user.getEmail())) {
-
-            checkEmailUser(userDto.getEmail());
-            user.setEmail(userDto.getEmail());
-        }
-
-        userStorage.update(user);
+        User user = userStorage.update(id, userDto);
         log.info("UserService.update: {} - Finished", user);
 
         return UserMapper.toUserDto(user);
@@ -82,17 +66,5 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long id) {
         log.info("UserService.deleteUser: {} ", id);
         userStorage.deleteUser(id);
-    }
-
-    private void checkEmailUser(String email) {
-        Optional<String> emails = getAll()
-                .stream()
-                .map(UserDto::getEmail)
-                .filter(e -> e.equals(email))
-                .findAny();
-
-        if (emails.isPresent()) {
-            throw new DuplicateEmailException("Такой Email уже существует");
-        }
     }
 }

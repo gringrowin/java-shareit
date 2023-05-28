@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,18 +21,12 @@ public class ItemDto {
     @Null(groups = MarkerItemDto.OnCreate.class)
     private Long id;
 
-    @NotNull(groups = MarkerItemDto.OnCreate.class)
     @NotBlank(groups = MarkerItemDto.OnCreate.class)
     private String name;
 
-    @NotNull(groups = MarkerItemDto.OnCreate.class)
     @NotBlank(groups = MarkerItemDto.OnCreate.class)
     private String description;
 
     @NotNull(groups = MarkerItemDto.OnCreate.class)
     private Boolean available;
-
-    @JsonIgnore
-    private Long request;
-
 }

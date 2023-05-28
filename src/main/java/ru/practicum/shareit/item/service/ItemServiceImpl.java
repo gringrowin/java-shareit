@@ -44,8 +44,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto create(Long userId, ItemDto itemDto) {
         log.info("ItemService.create: {} - Started", itemDto);
         User user = UserMapper.toUser(userService.getUser(userId));
-        Item item = ItemMapper.toItem(itemDto);
-        item.setOwner(user);
+        Item item = ItemMapper.toItem(itemDto, user);
         item = itemStorage.addItem(item);
         itemDto = ItemMapper.toItemDto(item);
         log.info("ItemService.create: {} - Finished", itemDto);
