@@ -7,6 +7,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.exception.ItemNotFoundException;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.storage.ItemStorage;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -20,22 +21,19 @@ import java.util.stream.Collectors;
 @Service
 public class ItemServiceImpl implements ItemService {
 
-    private final ItemStorage itemStorage;
+    private final ItemRepository itemRepository;
     private final UserService userService;
 
     @Autowired
-    public ItemServiceImpl(ItemStorage itemStorage, UserService userService) {
-        this.itemStorage = itemStorage;
+    public ItemServiceImpl(ItemRepository itemRepository, UserService userService) {
+        this.itemRepository = itemRepository;
         this.userService = userService;
     }
 
     @Override
     public ItemDto getItem(Long id) {
         log.info("ItemService.getItem id : {} - Started", id);
-        Item item = itemStorage.getItem(id);
-        if (item == null) {
-            throw new ItemNotFoundException(String.format("Вещь с ID : %s не найдена", id));
-        }
+        Item item = findById(id);
         log.info("ItemService.getItem id : {} - Finished", item);
         return ItemMapper.toItemDto(item);
     }
@@ -43,9 +41,9 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto create(Long userId, ItemDto itemDto) {
         log.info("ItemService.create: {} - Started", itemDto);
-        User user = UserMapper.toUser(userService.getUser(userId));
+        User user = userService.findById(userId);
         Item item = ItemMapper.toItem(itemDto, user);
-        item = itemStorage.addItem(item);
+        item = itemRepository.save(item);
         itemDto = ItemMapper.toItemDto(item);
         log.info("ItemService.create: {} - Finished", itemDto);
         return itemDto;
@@ -54,18 +52,13 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto update(Long userId, Long itemId, ItemDto itemDto) {
         log.info("ItemService.update: {} {} {} - Started", userId, itemId,  itemDto);
-        Item item = itemStorage.getItem(itemId);
-        if (item == null) {
-            throw new ItemNotFoundException(String.format("Вещь с ID : %s не найдена", itemId));
-        }
-
-        User user = UserMapper.toUser(userService.getUser(userId));
+        Item item = findById(itemId);
+        User user = userService.findById(userId);
         if (!user.equals((item.getOwner()))) {
             throw new ItemNotFoundException(
                     String.format("Пользователь с ID %s не является владельцем вещи", userId)
             );
         }
-
         if (itemDto.getName() != null) {
             item.setName(itemDto.getName());
         }
@@ -78,7 +71,7 @@ public class ItemServiceImpl implements ItemService {
             item.setAvailable(itemDto.getAvailable());
         }
 
-        item = itemStorage.update(item);
+        item = itemRepository.save(item);
         log.info("ItemService.update: {} - Finished", item);
         return ItemMapper.toItemDto(item);
     }
@@ -86,15 +79,14 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public void deleteItem(Long id) {
         log.info("ItemService.deleteItem: {} - Started", id);
-        getItem(id);
-        itemStorage.delete(id);
+        itemRepository.delete(findById(id));
         log.info("ItemService.deleteItem: {} - Finished", id);
     }
 
     @Override
     public List<ItemDto> getItemsByUserId(Long userId) {
         log.info("ItemService.getItemsByUserId: {} - Started", userId);
-        List<Item> itemsByUserId = itemStorage.getItemsByUserId(userId);
+        List<Item> itemsByUserId = itemRepository.findByOwnerId(userId);
         log.info("ItemService.getItemsByUserId: {} - Finished", itemsByUserId.size());
         return itemsByUserId.stream()
                 .map(ItemMapper::toItemDto)
@@ -107,10 +99,19 @@ public class ItemServiceImpl implements ItemService {
             return Collections.emptyList();
         }
         log.info("ItemService.searchItems: {} - Started", text);
-        List<Item> findItems = itemStorage.searchItems(text);
+        List<Item> findItems = itemRepository.search(text);
         log.info("ItemService.searchItems: {} - Finished", findItems.size());
         return findItems.stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
+    }
+
+    private Item findById(Long id) {
+        log.info("ItemService.findById id : {}", id);
+        return itemRepository.findById(id)
+                .orElseThrow(
+                        () -> new ItemNotFoundException(
+                                String.format("Вещь с ID : %s не найдена", id))
+                );
     }
 }

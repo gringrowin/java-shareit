@@ -19,4 +19,15 @@ public class UserMapper {
                 userDto.getName(),
                 userDto.getEmail());
     }
+
+    public static User toUser(User user, UserDto userDto) {
+        if (userDto.getName() != null) {
+            user.setName(userDto.getName());
+        }
+        if (userDto.getEmail() != null
+                && !userDto.getEmail().equals(user.getEmail())) {
+            user.setEmail(userDto.getEmail());
+        }
+        return user;
+    }
 }

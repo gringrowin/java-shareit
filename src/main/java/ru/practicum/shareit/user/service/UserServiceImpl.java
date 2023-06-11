@@ -7,26 +7,28 @@ import ru.practicum.shareit.user.exception.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.storage.UserStorage;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService {
 
-    private final UserStorage userStorage;
+    private final UserRepository userRepository;
 
     @Autowired
-    public UserServiceImpl(UserStorage userStorage) {
-        this.userStorage = userStorage;
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
 
     @Override
     public List<UserDto> getAll() {
-        List<User> users = userStorage.getAll();
+        List<User> users = userRepository.findAll();
         log.info("UserService.getAll: {}", users.size());
         return users.stream()
                 .map(UserMapper::toUserDto)
@@ -36,10 +38,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getUser(Long id) {
         log.info("UserService.getUser id : {} - Started", id);
-        User user = userStorage.getUser(id);
-        if (user == null) {
-            throw new UserNotFoundException(String.format("Пользователь с ID : %s не найден", id));
-        }
+        User user = findById(id);
         log.info("UserService.getUser: {} - Finished", user);
         return UserMapper.toUserDto(user);
     }
@@ -48,7 +47,7 @@ public class UserServiceImpl implements UserService {
     public UserDto create(UserDto userDto) {
         log.info("UserService.create: {} - Started", userDto);
         User user = UserMapper.toUser(userDto);
-        user = userStorage.add(user);
+        user = userRepository.save(user);
         log.info("UserService.create: {} - Finished", user);
         return UserMapper.toUserDto(user);
     }
@@ -56,15 +55,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto update(Long id, UserDto userDto) {
         log.info("UserService.update: {} {} - Started", id, userDto);
-        User user = userStorage.update(id, userDto);
+        User user = userRepository.save(UserMapper.toUser(findById(id), userDto));
         log.info("UserService.update: {} - Finished", user);
-
         return UserMapper.toUserDto(user);
     }
 
     @Override
     public void deleteUser(Long id) {
         log.info("UserService.deleteUser: {} ", id);
-        userStorage.deleteUser(id);
+        userRepository.delete(findById(id));
+    }
+
+    public User findById(Long id) {
+        log.info("UserService.findById: {} ", id);
+        return  userRepository.findById(id)
+                .orElseThrow(
+                        () -> new UserNotFoundException(
+                                String.format("Пользователь с ID : %s не найден", id))
+                );
     }
 }
