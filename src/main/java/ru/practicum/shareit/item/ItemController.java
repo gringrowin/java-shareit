@@ -3,7 +3,9 @@ package ru.practicum.shareit.item;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.comments.dto.CommentDto;
+import ru.practicum.shareit.item.dto.ItemInputDto;
+import ru.practicum.shareit.item.dto.ItemOutputDto;
 import ru.practicum.shareit.item.dto.MarkerItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
@@ -21,53 +23,64 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItem(@PathVariable("itemId") Long id) {
+    public ItemOutputDto getItem (@RequestHeader("X-Sharer-User-Id") Long userId,
+                                    @PathVariable("itemId") Long id) {
         log.info("ItemController.getItem: {} id - Started", id);
-        ItemDto itemDto = itemService.getItem(id);
-        log.info("ItemController.getItem: {} - Finished", itemDto);
-        return itemDto;
+        ItemOutputDto itemOutputDto = itemService.getItem(id, userId);
+        log.info("ItemController.getItem: {} - Finished", itemOutputDto);
+        return itemOutputDto;
     }
 
     @PostMapping
-    public ItemDto create(@RequestHeader("X-Sharer-User-Id") Long userId,
-                          @Validated(MarkerItemDto.OnCreate.class) @RequestBody ItemDto itemDto) {
-        log.info("ItemController.create: {} - Started", itemDto);
-        itemDto = itemService.create(userId, itemDto);
-        log.info("ItemController.create: {} - Finished", itemDto);
-        return itemDto;
+    public ItemOutputDto create(@RequestHeader("X-Sharer-User-Id") Long userId,
+                               @Validated(MarkerItemDto.OnCreate.class) @RequestBody ItemInputDto itemInputDto) {
+        log.info("ItemController.create: {} - Started", itemInputDto);
+        ItemOutputDto itemOutputDto = itemService.create(userId, itemInputDto);
+        log.info("ItemController.create: {} - Finished", itemOutputDto);
+        return itemOutputDto;
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto update(@RequestHeader("X-Sharer-User-Id") Long userId,
-                          @PathVariable("itemId") Long itemId,
-                          @Validated(MarkerItemDto.OnUpdate.class) @RequestBody ItemDto itemDto) {
-        log.info("ItemController.update: {} {} - Started", itemId, itemDto);
-        itemDto = itemService.update(userId, itemId, itemDto);
-        log.info("ItemController.update: {} - Finished", itemDto);
-        return itemDto;
+    public ItemOutputDto update(@RequestHeader("X-Sharer-User-Id") Long userId,
+                               @PathVariable("itemId") Long itemId,
+                               @Validated(MarkerItemDto.OnUpdate.class) @RequestBody ItemInputDto itemInputDto) {
+        log.info("ItemController.update: {} {} - Started", itemId, itemInputDto);
+        ItemOutputDto itemOutputDto = itemService.update(userId, itemId, itemInputDto);
+        log.info("ItemController.update: {} - Finished", itemOutputDto);
+        return itemOutputDto;
     }
 
     @DeleteMapping("/{itemId}")
-    public Long delete(@PathVariable("itemId") Long id) {
+    public Long delete(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable("itemId") Long id) {
         log.info("ItemController.delete: {} - Started", id);
-        itemService.deleteItem(id);
+        itemService.deleteItem(id, userId);
         log.info("ItemController.delete: {} - Finished", id);
         return id;
     }
 
     @GetMapping
-    public List<ItemDto> getItemsByUserId(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<ItemOutputDto> getItemsByUserId(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("ItemController.delete: {} - Started", userId);
-        List<ItemDto> items = itemService.getItemsByUserId(userId);
+        List<ItemOutputDto> items = itemService.getItemsByUserId(userId);
         log.info("ItemController.delete: {} - Finished", items.size());
         return items;
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItems(@RequestParam(name = "text") String text) {
+    public List<ItemOutputDto> searchItems(@RequestParam(name = "text") String text) {
         log.info("ItemController.searchItems: {} - Started", text);
-        List<ItemDto> items = itemService.searchItems(text);
+        List<ItemOutputDto> items = itemService.searchItems(text);
         log.info("ItemController.searchItems: {} - Finished", items.size());
         return items;
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addComment(@PathVariable long itemId,
+                                 @RequestHeader("X-Sharer-User-Id") long userId,
+                                 @RequestBody CommentDto commentDto) {
+        log.info("addComment: id {}, commentDto {}, userId {} патч начат", itemId, commentDto, userId);
+        CommentDto result = itemService.addComment(itemId, userId, commentDto);
+        log.info("Добавление комметария завершено. Результат: {}", result);
+        return result;
     }
 }
