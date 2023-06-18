@@ -10,7 +10,6 @@ import ru.practicum.shareit.exception.InvalidCommentException;
 import ru.practicum.shareit.exception.ItemNotAvailableException;
 import ru.practicum.shareit.item.comments.dto.CommentDto;
 import ru.practicum.shareit.item.comments.mapper.CommentMapper;
-import ru.practicum.shareit.item.comments.model.Comment;
 import ru.practicum.shareit.item.comments.repository.CommentRepository;
 import ru.practicum.shareit.item.dto.ItemInputDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
@@ -170,12 +169,11 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public CommentDto addComment(Long itemId, Long userId, CommentDto commentDto) {
+        log.info("ItemService.addComment: {}, {}. {} - Started", itemId, userId, commentDto);
         User user = userService.findById(userId);
 
         commentDto.setAuthorName(user.getName());
-
-        LocalDateTime created = LocalDateTime.now();
-        commentDto.setCreated(created);
+        commentDto.setCreated(LocalDateTime.now());
         commentDto.setItemId(itemId);
 
         Item item = findById(itemId);
@@ -189,8 +187,10 @@ public class ItemServiceImpl implements ItemService {
         if (commentDto.getText().isEmpty()) {
             throw new InvalidCommentException("Пустой коментарий");
         }
-
-        return CommentMapper.toDto(commentRepository.save(CommentMapper.toEntity(commentDto, user, item)));
+        log.info("ItemService.addComment: {} - Finished", commentDto);
+        return CommentMapper.toCommentDto(
+                commentRepository.save(CommentMapper.toComment(commentDto, user, item))
+        );
     }
 
     private Booking getNextBooking(Long id) {
@@ -201,10 +201,10 @@ public class ItemServiceImpl implements ItemService {
         return bookingRepository.findFirstByItemIdAndStartBeforeOrderByStartDesc(id, LocalDateTime.now());
     }
 
-    private List<CommentDto> getCommentsByItemId (Long itemId) {
+    private List<CommentDto> getCommentsByItemId(Long itemId) {
         return commentRepository.findByItemId(itemId)
                 .stream()
-                .map(CommentMapper::toDto)
+                .map(CommentMapper::toCommentDto)
                 .collect(Collectors.toList());
     }
 }

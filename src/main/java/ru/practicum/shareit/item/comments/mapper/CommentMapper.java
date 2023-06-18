@@ -9,7 +9,7 @@ import ru.practicum.shareit.user.model.User;
 @Component
 public class CommentMapper {
 
-    public static CommentDto toDto(Comment comment) {
+    public static CommentDto toCommentDto(Comment comment) {
         return CommentDto.builder()
                 .id(comment.getId())
                 .text(comment.getText())
@@ -19,7 +19,7 @@ public class CommentMapper {
                 .build();
     }
 
-    public static Comment toEntity(CommentDto commentDto, User author, Item item) {
+    public static Comment toComment(CommentDto commentDto, User author, Item item) {
         if (commentDto != null) {
             Comment comment = new Comment();
             comment.setId(commentDto.getId());

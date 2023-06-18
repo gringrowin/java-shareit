@@ -20,8 +20,8 @@ public class ErrorHandler {
         );
     }
 
-    @ExceptionHandler(
-            {ItemNotAvailableException.class,
+    @ExceptionHandler({
+            ItemNotAvailableException.class,
             StateNotFoundException.class,
             MethodArgumentNotValidException.class,
             InvalidCommentException.class})

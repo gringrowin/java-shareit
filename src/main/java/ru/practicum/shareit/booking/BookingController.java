@@ -19,44 +19,56 @@ public class BookingController {
     private final BookingService service;
 
     @Autowired
-    public BookingController (BookingService service) {
+    public BookingController(BookingService service) {
         this.service = service;
     }
 
     @PostMapping
-    public Booking addBooking (@RequestHeader("X-Sharer-User-Id") Long bookerId,
+    public Booking addBooking(@RequestHeader("X-Sharer-User-Id") Long bookerId,
                               @Valid @RequestBody BookingDto bookingDto) {
-        log.info("BookingController.addBooking: {} bookerId - Started", bookerId);
+        log.info("BookingController.addBooking: {} - Started", bookingDto);
         Booking booking = service.addBooking(bookerId, bookingDto);
         log.info("BookingController.addBooking: {} - Finished", booking);
         return booking;
     }
 
     @PatchMapping("/{bookingId}")
-    public Booking approveBooking (@RequestHeader("X-Sharer-User-Id") Long ownerId,
+    public Booking approveBooking(@RequestHeader("X-Sharer-User-Id") Long ownerId,
                                            @RequestParam Boolean approved,
                                            @PathVariable Long bookingId) {
-        return service.approveBooking(ownerId, approved, bookingId);
+        log.info("BookingController.approveBooking: {}, {} - Started", ownerId, bookingId);
+        Booking booking = service.approveBooking(ownerId, approved, bookingId);
+        log.info("BookingController.approveBooking: {} - Finished", booking);
+        return booking;
     }
 
     @GetMapping("/{bookingId}")
-    public Booking getBookingById (@RequestHeader("X-Sharer-User-Id") Long bookerId,
+    public Booking getBookingById(@RequestHeader("X-Sharer-User-Id") Long bookerId,
                                            @PathVariable Long bookingId) {
-        return service.getBookingById(bookerId, bookingId);
+        log.info("BookingController.getBookingById: {}, {} - Started", bookerId, bookingId);
+        Booking booking = service.getBookingById(bookerId, bookingId);
+        log.info("BookingController.getBookingById: {} - Finished", booking);
+        return booking;
     }
 
     @GetMapping
-    public List<Booking> getAllBookingsByBooker (
+    public List<Booking> getAllBookingsByBooker(
             @RequestHeader("X-Sharer-User-Id") Long bookerId,
             @RequestParam(required = false, defaultValue = "ALL") BookingState state) {
-        return service.getAllBookingsByBookerAndState(bookerId, state);
+        log.info("BookingController.getAllBookingsByBooker: {}, {} - Started", bookerId, state);
+        List<Booking> bookings = service.getAllBookingsByBookerAndState(bookerId, state);
+        log.info("BookingController.getAllBookingsByBooker: {} - Finished", bookings.size());
+        return bookings;
     }
 
     @GetMapping("/owner")
     public List<Booking> getAllBookingsByOwner(
             @RequestHeader("X-Sharer-User-Id") Long bookerId,
             @RequestParam(required = false, defaultValue = "ALL") BookingState state) {
-        return service.getAllBookingsByOwnerAndState(bookerId, state);
+        log.info("BookingController.getAllBookingsByOwner: {}, {} - Started", bookerId, state);
+        List<Booking> bookings = service.getAllBookingsByOwnerAndState(bookerId, state);
+        log.info("BookingController.getAllBookingsByOwner: {} - Finished", bookings.size());
+        return bookings;
     }
 
 }

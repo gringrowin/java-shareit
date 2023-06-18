@@ -23,7 +23,7 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemOutputDto getItem (@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ItemOutputDto getItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                                     @PathVariable("itemId") Long id) {
         log.info("ItemController.getItem: {} id - Started", id);
         ItemOutputDto itemOutputDto = itemService.getItem(id, userId);
