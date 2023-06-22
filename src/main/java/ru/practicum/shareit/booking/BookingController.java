@@ -56,7 +56,7 @@ public class BookingController {
             @RequestHeader("X-Sharer-User-Id") Long bookerId,
             @RequestParam(required = false, defaultValue = "ALL") BookingState state) {
         log.info("BookingController.getAllBookingsByBooker: {}, {} - Started", bookerId, state);
-        List<Booking> bookings = service.getAllBookingsByBookerAndState(bookerId, state);
+        List<Booking> bookings = service.getAllBookingsByBooker(bookerId, state);
         log.info("BookingController.getAllBookingsByBooker: {} - Finished", bookings.size());
         return bookings;
     }
@@ -66,9 +66,8 @@ public class BookingController {
             @RequestHeader("X-Sharer-User-Id") Long bookerId,
             @RequestParam(required = false, defaultValue = "ALL") BookingState state) {
         log.info("BookingController.getAllBookingsByOwner: {}, {} - Started", bookerId, state);
-        List<Booking> bookings = service.getAllBookingsByOwnerAndState(bookerId, state);
+        List<Booking> bookings = service.getAllBookingsByOwner(bookerId, state);
         log.info("BookingController.getAllBookingsByOwner: {} - Finished", bookings.size());
         return bookings;
     }
-
 }

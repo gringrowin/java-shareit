@@ -21,4 +21,11 @@ public class BookingMapper {
         return booking;
     }
 
+    public static ItemResponseBookingDto toItemResponseBookingDto(Booking booking) {
+                return ItemResponseBookingDto.builder()
+                        .id(booking.getId())
+                        .bookerId(booking.getBooker().getId())
+                        .status(booking.getStatus())
+                        .build();
+    }
 }

@@ -6,6 +6,8 @@ import ru.practicum.shareit.item.comments.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
+import java.time.LocalDateTime;
+
 @Component
 public class CommentMapper {
 
@@ -26,7 +28,7 @@ public class CommentMapper {
             comment.setText(commentDto.getText());
             comment.setAuthor(author);
             comment.setItem(item);
-            comment.setCreated(commentDto.getCreated());
+            comment.setCreated(LocalDateTime.now());
             return comment;
         }
         return null;

@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
@@ -15,8 +16,8 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -96,24 +97,6 @@ public class BookingServiceImpl implements BookingService {
         return booking;
     }
 
-    @Override
-    public List<Booking> getAllBookingsByBookerAndState(Long bookerId, BookingState state) {
-        log.info("BookingService.getAllBookingsByBookerAndState: {}, {} - Started", bookerId, state);
-        return getAllBookingsByState(bookerId, state)
-                .stream()
-                .filter(booking -> booking.getBooker().getId().equals(bookerId))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<Booking> getAllBookingsByOwnerAndState(Long bookerId, BookingState state) {
-        log.info("BookingService.getAllBookingsByOwnerAndState: {}, {} - Started", bookerId, state);
-        return getAllBookingsByState(bookerId, state)
-                .stream()
-                .filter(booking -> booking.getItem().getOwner().getId().equals(bookerId))
-                .collect(Collectors.toList());
-    }
-
     public Booking findById(Long id) {
         log.info("BookingService.findById id : {}", id);
         return bookingRepository.findById(id)
@@ -123,31 +106,81 @@ public class BookingServiceImpl implements BookingService {
                 );
     }
 
-    private List<Booking> getAllBookingsByState(Long bookerId, BookingState state) {
+    @Override
+    public List<Booking> getAllBookingsByBooker(Long userId, BookingState state) {
+        userService.findById(userId);
 
-      userService.findById(bookerId);
-
+        List<Booking> bookings;
+        Sort newestFirst = Sort.by(Sort.Direction.DESC, "start");
         switch (state) {
-            case ALL:
-                return bookingRepository.findByStatusInOrderByStartDesc(List.of(BookingState.values()));
-
-            case PAST:
-                return bookingRepository.findByEndBeforeOrderByStartDesc(LocalDateTime.now());
-
-            case CURRENT:
-                return bookingRepository.findByStartBeforeAndEndAfterOrderByStartDesc(
-                        LocalDateTime.now(),
-                        LocalDateTime.now()
-                );
-
-            case FUTURE:
-                return bookingRepository.findByStartAfterOrderByStartDesc(LocalDateTime.now());
-
+            case ALL: {
+                bookings = bookingRepository.findByBooker_Id(userId, newestFirst);
+                break;
+            }
+            case PAST: {
+                bookings = bookingRepository.findByBooker_IdAndEndIsBefore(userId, LocalDateTime.now(), newestFirst);
+                break;
+            }
+            case FUTURE: {
+                bookings = bookingRepository.findByBooker_IdAndStartIsAfter(userId, LocalDateTime.now(), newestFirst);
+                break;
+            }
+            case CURRENT: {
+                bookings = bookingRepository.findCurrentForDate(userId, LocalDateTime.now(), newestFirst);
+                break;
+            }
+            case WAITING: {
+                bookings = bookingRepository.findPending(userId, newestFirst);
+                break;
+            }
+            case REJECTED: {
+                bookings = bookingRepository.findCanceled(userId, newestFirst);
+                break;
+            }
             case UNSUPPORTED_STATUS:
                 throw new StateNotFoundException("Unknown state: UNSUPPORTED_STATUS");
-
             default:
-                return bookingRepository.findByStatusInOrderByStartDesc(List.of(state));
+                bookings = new ArrayList<>();
         }
+        return bookings;
+    }
+
+    @Override
+    public List<Booking> getAllBookingsByOwner(Long userId, BookingState state) {
+        userService.findById(userId);
+
+        List<Booking> bookings;
+        Sort newestFirst = Sort.by(Sort.Direction.DESC, "start");
+        switch (state) {
+            case ALL: {
+                bookings = bookingRepository.findByItem_Owner_Id(userId, newestFirst);
+                break;
+            }
+            case PAST: {
+                bookings = bookingRepository.findByItem_Owner_IdAndEndIsBefore(userId, LocalDateTime.now(), newestFirst);
+                break;
+            }
+            case FUTURE: {
+                bookings = bookingRepository.findByItem_Owner_IdAndStartIsAfter(userId, LocalDateTime.now(), newestFirst);
+                break;
+            }
+            case CURRENT: {
+                bookings = bookingRepository.findOwnerCurrentForDate(userId, LocalDateTime.now(), newestFirst);
+                break;
+            }
+            case WAITING: {
+                bookings = bookingRepository.findOwnerPending(userId, newestFirst);
+                break;
+            }
+            case REJECTED: {
+                bookings = bookingRepository.findOwnerCanceled(userId, newestFirst);
+                break;
+            }
+            case UNSUPPORTED_STATUS:
+                throw new StateNotFoundException("Unknown state: UNSUPPORTED_STATUS");
+            default:
+                bookings = new ArrayList<>();
+        }
+        return bookings;
     }
 }
