@@ -2,7 +2,7 @@ package ru.practicum.shareit.user.storage;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.exception.DuplicateEmailException;
+import ru.practicum.shareit.exception.DuplicateEmailException;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.*;

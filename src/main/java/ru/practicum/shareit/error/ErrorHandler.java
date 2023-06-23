@@ -5,26 +5,30 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.shareit.item.exception.ItemNotFoundException;
-import ru.practicum.shareit.user.exception.DuplicateEmailException;
-import ru.practicum.shareit.user.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.*;
 
 @RestControllerAdvice
 public class ErrorHandler {
 
-    @ExceptionHandler({UserNotFoundException.class, ItemNotFoundException.class})
+    @ExceptionHandler({UserNotFoundException.class,
+            ItemNotFoundException.class,
+            BookingNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleUserNotFoundException(final RuntimeException e) {
+    public ErrorResponse handleNotFoundException(final RuntimeException e) {
         return new ErrorResponse(
                 e.getMessage()
         );
     }
 
-    @ExceptionHandler
+    @ExceptionHandler({
+            ItemNotAvailableException.class,
+            StateNotFoundException.class,
+            MethodArgumentNotValidException.class,
+            InvalidCommentException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+    public ErrorResponse handleMethodArgumentNotValidException(RuntimeException e) {
         return new ErrorResponse(
-               "Ошибка в аргументах " + e.getMessage()
+               e.getMessage()
         );
     }
 
