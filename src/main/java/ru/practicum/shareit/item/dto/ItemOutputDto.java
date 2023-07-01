@@ -30,4 +30,6 @@ public class ItemOutputDto {
     private ItemResponseBookingDto nextBooking;
 
     private List<CommentDto> comments = new ArrayList<>();
+
+    private Long requestId;
 }

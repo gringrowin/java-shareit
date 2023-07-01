@@ -10,15 +10,6 @@ import java.util.Objects;
 
 public class ItemMapper {
 
-    public static ItemInputDto toItemDto(Item item) {
-        return new ItemInputDto(
-                item.getId(),
-                item.getName(),
-                item.getDescription(),
-                item.getAvailable()
-        );
-    }
-
     public static ItemOutputDto toItemOutputDto(
             Item item,
             Long userId,
@@ -39,16 +30,29 @@ public class ItemMapper {
             itemOutputDto.setLastBooking(lastBooking);
             itemOutputDto.setNextBooking(nextBooking);
         }
+        itemOutputDto.setRequestId(item.getItemRequestId());
         return itemOutputDto;
     }
 
-    public static Item toItem(ItemInputDto itemInputDto, User user) {
+    public static Item toItem(ItemDto itemDto, User user) {
+
         return new Item(
-                itemInputDto.getId(),
-                itemInputDto.getName(),
-                itemInputDto.getDescription(),
-                itemInputDto.getAvailable(),
-                user
+                itemDto.getId(),
+                itemDto.getName(),
+                itemDto.getDescription(),
+                itemDto.getAvailable(),
+                user,
+                itemDto.getRequestId()
         );
+    }
+
+    public static ItemDto toItemDto(Item item) {
+        ItemDto itemDto = new ItemDto();
+            itemDto.setId(item.getId());
+            itemDto.setName(item.getName());
+            itemDto.setDescription(item.getDescription());
+            itemDto.setAvailable(item.getAvailable());
+            itemDto.setRequestId(item.getItemRequestId());
+        return itemDto;
     }
 }

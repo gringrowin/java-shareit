@@ -11,7 +11,7 @@ import javax.validation.constraints.Null;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ItemInputDto {
+public class ItemDto {
 
     @Null(groups = MarkerItemDto.OnCreate.class)
     private Long id;
@@ -25,5 +25,5 @@ public class ItemInputDto {
     @NotNull(groups = MarkerItemDto.OnCreate.class)
     private Boolean available;
 
-
+    private Long requestId;
 }

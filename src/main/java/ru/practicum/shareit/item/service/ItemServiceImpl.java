@@ -13,7 +13,7 @@ import ru.practicum.shareit.exception.ItemNotAvailableException;
 import ru.practicum.shareit.item.comments.dto.CommentDto;
 import ru.practicum.shareit.item.comments.mapper.CommentMapper;
 import ru.practicum.shareit.item.comments.repository.CommentRepository;
-import ru.practicum.shareit.item.dto.ItemInputDto;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.item.dto.ItemOutputDto;
@@ -41,7 +41,8 @@ public class ItemServiceImpl implements ItemService {
     @Autowired
     public ItemServiceImpl(ItemRepository itemRepository,
                            BookingRepository bookingRepository,
-                           CommentRepository commentRepository, UserService userService) {
+                           CommentRepository commentRepository,
+                           UserService userService) {
         this.itemRepository = itemRepository;
         this.bookingRepository = bookingRepository;
         this.commentRepository = commentRepository;
@@ -66,10 +67,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public ItemOutputDto create(Long userId, ItemInputDto itemInputDto) {
-        log.info("ItemService.create: {} - Started", itemInputDto);
+    public ItemOutputDto create(Long userId, ItemDto itemDto) {
+        log.info("ItemService.create: {} - Started", itemDto);
         User user = userService.findById(userId);
-        Item item = ItemMapper.toItem(itemInputDto, user);
+        Item item = ItemMapper.toItem(itemDto, user);
         item = itemRepository.save(item);
         log.info("ItemService.create: {} - Finished", item);
         return ItemMapper.toItemOutputDto(
@@ -83,8 +84,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public ItemOutputDto update(Long userId, Long itemId, ItemInputDto itemInputDto) {
-        log.info("ItemService.update: {} {} {} - Started", userId, itemId, itemInputDto);
+    public ItemOutputDto update(Long userId, Long itemId, ItemDto itemDto) {
+        log.info("ItemService.update: {} {} {} - Started", userId, itemId, itemDto);
         Item item = findById(itemId);
         User user = userService.findById(userId);
         if (!user.equals((item.getOwner()))) {
@@ -92,16 +93,16 @@ public class ItemServiceImpl implements ItemService {
                     String.format("Пользователь с ID %s не является владельцем вещи", userId)
             );
         }
-        if (itemInputDto.getName() != null) {
-            item.setName(itemInputDto.getName());
+        if (itemDto.getName() != null) {
+            item.setName(itemDto.getName());
         }
 
-        if (itemInputDto.getDescription() != null) {
-            item.setDescription(itemInputDto.getDescription());
+        if (itemDto.getDescription() != null) {
+            item.setDescription(itemDto.getDescription());
         }
 
-        if (itemInputDto.getAvailable() != null) {
-            item.setAvailable(itemInputDto.getAvailable());
+        if (itemDto.getAvailable() != null) {
+            item.setAvailable(itemDto.getAvailable());
         }
 
         item = itemRepository.save(item);
@@ -189,6 +190,14 @@ public class ItemServiceImpl implements ItemService {
         return CommentMapper.toCommentDto(
                 commentRepository.save(CommentMapper.toComment(commentDto, user, item))
         );
+    }
+
+    @Override
+    public List<ItemDto> getItemsByRequestId(Long requestId) {
+        return itemRepository.findItemsByItemRequestId(requestId)
+                .stream()
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList());
     }
 
     private ItemResponseBookingDto getNextBooking(Long itemId) {
