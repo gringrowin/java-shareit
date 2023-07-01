@@ -44,7 +44,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         log.info("ItemRequestService.getItemRequestById: {} {} - Started", itemRequestId, userId);
         userService.findById(userId);
         ItemRequest itemRequest = findById(itemRequestId);
-        List<ItemDto> items = itemService.getItemsByRequestId(itemRequest.getId());
+        List<ItemDto> items = itemService.getItemsByRequestId(itemRequestId);
         log.info("ItemRequestService.getItemRequestById: {} - Finished", itemRequest);
         return ItemRequestMapper.toItemRequestOutputDto(itemRequest, items);
     }
