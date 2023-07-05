@@ -50,15 +50,15 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemOutputDto getItem(Long id, Long userId) {
-        log.info("ItemService.getItem id : {} - Started", id);
-        Item item = findById(id);
+    public ItemOutputDto getItem(Long itemId, Long userId) {
+        log.info("ItemService.getItem id : {} - Started", itemId);
+        Item item = findById(itemId);
         ItemOutputDto itemOutputDto = ItemMapper.toItemOutputDto(
                 item,
                 userId,
-                getLastBooking(item.getId()),
-                getNextBooking(item.getId()),
-                getCommentsByItemId(id)
+                getLastBooking(itemId),
+                getNextBooking(itemId),
+                getCommentsByItemId(itemId)
         );
         log.info("ItemService.getItem id : {} - Finished", itemOutputDto);
         return itemOutputDto;

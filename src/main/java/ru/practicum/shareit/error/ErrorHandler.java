@@ -34,14 +34,6 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleDuplicateEmailException(DuplicateEmailException e) {
-        return new ErrorResponse(
-                "Email already exists " + e.getMessage()
-        );
-    }
-
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleThrowable(final Throwable e) {
         return new ErrorResponse(

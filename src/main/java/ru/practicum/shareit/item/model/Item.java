@@ -21,7 +21,7 @@ public class Item {
     private String name;
     private String description;
     private Boolean available;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @ToString.Exclude
     private User owner;
     @Column(name = "item_request_id")

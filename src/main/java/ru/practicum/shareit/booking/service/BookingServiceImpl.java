@@ -49,7 +49,8 @@ public class BookingServiceImpl implements BookingService {
         if (!item.getAvailable()) {
             throw new ItemNotAvailableException("Вещь недоступна");
         }
-        if (bookingDto.getEnd().isBefore(bookingDto.getStart()) || bookingDto.getStart().isEqual(bookingDto.getEnd())) {
+        if (bookingDto.getEnd().isBefore(bookingDto.getStart())
+                || bookingDto.getStart().isEqual(bookingDto.getEnd())) {
             throw new ItemNotAvailableException("Недопустимая длительность аренды");
         }
         Booking booking = bookingRepository.save(BookingMapper.toBooking(bookingDto,
