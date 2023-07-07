@@ -22,6 +22,7 @@ import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemOutputDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -68,7 +69,12 @@ class ItemServiceImplTest {
 
     @BeforeEach
     void setItemService() {
-        itemService = new ItemServiceImpl(itemRepository, bookingRepository, commentRepository, userService);
+        itemService = new ItemServiceImpl(
+                itemRepository,
+                bookingRepository,
+                commentRepository,
+                userService
+                );
 
         itemMapperMockedStatic = Mockito.mockStatic(ItemMapper.class);
         when(ItemMapper.toItem(any(), any())).thenReturn(item);

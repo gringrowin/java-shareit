@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.dto;
 import ru.practicum.shareit.booking.dto.ItemResponseBookingDto;
 import ru.practicum.shareit.item.comments.dto.CommentDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
@@ -30,20 +31,19 @@ public class ItemMapper {
             itemOutputDto.setLastBooking(lastBooking);
             itemOutputDto.setNextBooking(nextBooking);
         }
-        itemOutputDto.setRequestId(item.getItemRequestId());
+        itemOutputDto.setRequestId(item.getItemRequest().getId());
         return itemOutputDto;
     }
 
     public static Item toItem(ItemDto itemDto, User user) {
+        Item item = new Item();
+            item.setId(itemDto.getId());
+            item.setName(itemDto.getName());
+            item.setDescription(itemDto.getDescription());
+            item.setAvailable(itemDto.getAvailable());
+            item.setOwner(user);
 
-        return new Item(
-                itemDto.getId(),
-                itemDto.getName(),
-                itemDto.getDescription(),
-                itemDto.getAvailable(),
-                user,
-                itemDto.getRequestId()
-        );
+        return item;
     }
 
     public static ItemDto toItemDto(Item item) {
@@ -52,7 +52,7 @@ public class ItemMapper {
             itemDto.setName(item.getName());
             itemDto.setDescription(item.getDescription());
             itemDto.setAvailable(item.getAvailable());
-            itemDto.setRequestId(item.getItemRequestId());
+            itemDto.setRequestId(item.getItemRequest().getId());
         return itemDto;
     }
 }

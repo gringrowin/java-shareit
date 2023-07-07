@@ -3,6 +3,7 @@ package ru.practicum.shareit.request.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.ItemRequestNotFoundException;
@@ -54,8 +55,10 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public List<ItemRequestOutputDto> getItemRequestsByOtherUsers(Long userId, Integer from, Integer size) {
         log.info("ItemRequestService.getItemRequestsByOtherUsers: {} - Started", userId);
         User user = userService.findById(userId);
+        PageRequest pageRequest = PageRequest.of(from / size, size,
+                Sort.by(Sort.Direction.DESC, "created"));
         List<ItemRequest> itemRequests = itemRequestRepository
-                .findByRequesterNotInOrderByCreatedDesc(List.of(user), PageRequest.of(from / size, size));
+                .findByRequesterNotIn(List.of(user), pageRequest);
         List<ItemRequestOutputDto> itemRequestOutputDtos = itemRequests.stream()
                 .map(itemRequest ->
                         ItemRequestMapper.toItemRequestOutputDto(

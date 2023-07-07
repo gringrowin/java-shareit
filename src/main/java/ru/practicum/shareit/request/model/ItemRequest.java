@@ -19,6 +19,7 @@ public class ItemRequest {
     private Long id;
     private String description;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "requester_id")
     @ToString.Exclude
     private User requester;
     private LocalDateTime created;

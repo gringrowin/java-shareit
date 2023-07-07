@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.booking.dto.ItemResponseBookingDto;
 import ru.practicum.shareit.item.comments.dto.CommentDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
@@ -13,19 +14,21 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ItemMapperTest {
 
-    ItemOutputDto itemOutputDto;
+    private ItemOutputDto itemOutputDto;
 
-    ItemDto itemDto;
+    private ItemDto itemDto;
 
-    Item item;
+    private Item item;
 
-    CommentDto commentDto;
+    private  CommentDto commentDto;
 
-    ItemResponseBookingDto lastBooking;
+    private ItemResponseBookingDto lastBooking;
 
-    ItemResponseBookingDto nextBooking;
+    private ItemResponseBookingDto nextBooking;
 
-    User user;
+    private User user;
+
+    private ItemRequest itemRequest;
 
     @BeforeEach
     void setTestData() {
@@ -34,13 +37,16 @@ class ItemMapperTest {
         nextBooking = new ItemResponseBookingDto();
         commentDto = new CommentDto();
 
+        itemRequest = new ItemRequest();
+            itemRequest.setId(1L);
+
         item = new Item();
             item.setId(1L);
             item.setName("name");
             item.setDescription("description");
             item.setAvailable(true);
             item.setOwner(user);
-            item.setItemRequestId(1L);
+            item.setItemRequest(itemRequest);
 
         itemDto = new ItemDto();
             itemDto.setId(1L);

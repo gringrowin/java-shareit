@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
@@ -24,6 +25,7 @@ public class Item {
     @ManyToOne(fetch = FetchType.EAGER)
     @ToString.Exclude
     private User owner;
-    @Column(name = "item_request_id")
-    private Long itemRequestId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "item_request_id")
+    private ItemRequest itemRequest;
 }
