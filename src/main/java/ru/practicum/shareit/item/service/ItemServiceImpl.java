@@ -10,6 +10,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.InvalidCommentException;
 import ru.practicum.shareit.exception.ItemNotAvailableException;
+import ru.practicum.shareit.exception.ItemRequestNotFoundException;
 import ru.practicum.shareit.item.comments.dto.CommentDto;
 import ru.practicum.shareit.item.comments.mapper.CommentMapper;
 import ru.practicum.shareit.item.comments.repository.CommentRepository;
@@ -22,7 +23,6 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
-import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -39,17 +39,20 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
     private final UserService userService;
 
     @Autowired
     public ItemServiceImpl(ItemRepository itemRepository,
                            BookingRepository bookingRepository,
                            CommentRepository commentRepository,
-                           UserService userService) {
+                           UserService userService,
+                           ItemRequestRepository itemRequestRepository) {
         this.itemRepository = itemRepository;
         this.bookingRepository = bookingRepository;
         this.commentRepository = commentRepository;
         this.userService = userService;
+        this.itemRequestRepository = itemRequestRepository;
     }
 
     @Override
@@ -73,7 +76,15 @@ public class ItemServiceImpl implements ItemService {
     public ItemOutputDto create(Long userId, ItemDto itemDto) {
         log.info("ItemService.create: {} - Started", itemDto);
         User user = userService.findById(userId);
-        Item item = ItemMapper.toItem(itemDto, user);
+        ItemRequest itemRequest = null;
+        if (itemDto.getRequestId() != null) {
+            itemRequest = itemRequestRepository
+                    .findById(itemDto.getRequestId())
+                    .orElseThrow(() -> new ItemRequestNotFoundException(
+                            String.format("Запрос с ID : %s не найден", itemDto.getRequestId())
+                    ));
+        }
+        Item item = ItemMapper.toItem(itemDto, user, itemRequest);
         item = itemRepository.save(item);
         log.info("ItemService.create: {} - Finished", item);
         return ItemMapper.toItemOutputDto(

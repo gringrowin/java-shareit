@@ -9,6 +9,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.exception.ItemRequestNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
@@ -87,11 +88,13 @@ class ItemRequestServiceImplTest {
     void getItemRequestsByOtherUsersTest() {
         Integer from = 1;
         Integer size = 1;
+        PageRequest pageRequest = PageRequest.of(from / size, size,
+                Sort.by(Sort.Direction.DESC, "created"));
         when(userService.findById(10L)).thenReturn(user);
         when(itemRequestRepository
-                .findByRequesterNotInOrderByCreatedDesc(
+                .findByRequesterNotIn(
                         List.of(user),
-                        PageRequest.of(from / size, size)))
+                        pageRequest))
                 .thenReturn(List.of(itemRequest));
         when(itemService.getItemsByRequestId(itemRequest.getId())).thenReturn(List.of(itemDto));
 
@@ -100,9 +103,9 @@ class ItemRequestServiceImplTest {
 
         verify(userService, times(1)).findById(10L);
         verify(itemRequestRepository, times(1))
-                .findByRequesterNotInOrderByCreatedDesc(
+                .findByRequesterNotIn(
                         List.of(user),
-                        PageRequest.of(from / size, size));
+                        pageRequest);
         verify(itemService, times(1)).getItemsByRequestId(itemRequest.getId());
 
         assertEquals(itemRequestOutputDtos, List.of(itemRequestOutputDto));

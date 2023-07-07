@@ -31,17 +31,20 @@ public class ItemMapper {
             itemOutputDto.setLastBooking(lastBooking);
             itemOutputDto.setNextBooking(nextBooking);
         }
-        itemOutputDto.setRequestId(item.getItemRequest().getId());
+        if (item.getItemRequest() != null) {
+            itemOutputDto.setRequestId(item.getItemRequest().getId());
+        }
         return itemOutputDto;
     }
 
-    public static Item toItem(ItemDto itemDto, User user) {
+    public static Item toItem(ItemDto itemDto, User user, ItemRequest itemRequest) {
         Item item = new Item();
             item.setId(itemDto.getId());
             item.setName(itemDto.getName());
             item.setDescription(itemDto.getDescription());
             item.setAvailable(itemDto.getAvailable());
             item.setOwner(user);
+            item.setItemRequest(itemRequest);
 
         return item;
     }

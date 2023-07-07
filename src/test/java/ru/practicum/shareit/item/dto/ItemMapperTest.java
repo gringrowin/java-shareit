@@ -99,7 +99,7 @@ class ItemMapperTest {
 
     @Test
     void toItem() {
-        Item itemTest = ItemMapper.toItem(itemDto, user);
+        Item itemTest = ItemMapper.toItem(itemDto, user, itemRequest);
         assertEquals(itemTest, item);
     }
 

@@ -22,7 +22,8 @@ import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemOutputDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.request.service.ItemRequestService;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -47,6 +48,8 @@ class ItemServiceImplTest {
     @Mock
     private CommentRepository commentRepository;
     @Mock
+    private ItemRequestRepository itemRequestRepository;
+    @Mock
     private UserService userService;
 
     private ItemService itemService;
@@ -58,8 +61,8 @@ class ItemServiceImplTest {
     private final CommentDto commentDto = mock(CommentDto.class);
     private final Comment comment = mock(Comment.class);
     private final Booking booking = mock(Booking.class);
+    private final ItemRequest itemRequest = mock((ItemRequest.class));
 
-    private Clock clock;
     private LocalDateTime dateTime;
 
     private MockedStatic<ItemMapper> itemMapperMockedStatic;
@@ -73,11 +76,12 @@ class ItemServiceImplTest {
                 itemRepository,
                 bookingRepository,
                 commentRepository,
-                userService
+                userService,
+                itemRequestRepository
                 );
 
         itemMapperMockedStatic = Mockito.mockStatic(ItemMapper.class);
-        when(ItemMapper.toItem(any(), any())).thenReturn(item);
+        when(ItemMapper.toItem(any(), any(), any())).thenReturn(item);
         when(ItemMapper.toItemDto(any())).thenReturn(itemDto);
         when(ItemMapper.toItemOutputDto(any(), any(), any(), any(), any()))
                 .thenReturn(itemOutputDto);
@@ -86,7 +90,7 @@ class ItemServiceImplTest {
         when(CommentMapper.toComment(any(), any(), any())).thenReturn(comment);
         when(CommentMapper.toCommentDto(any())).thenReturn(commentDto);
 
-        clock = Clock.fixed(Instant.parse("2014-12-22T10:15:30.00Z"), ZoneId.of("UTC"));
+        Clock clock = Clock.fixed(Instant.parse("2014-12-22T10:15:30.00Z"), ZoneId.of("UTC"));
         dateTime = LocalDateTime.now(clock);
         localDateTimeMockedStatic = mockStatic(LocalDateTime.class);
         when(LocalDateTime.now()).thenReturn(dateTime);
@@ -114,6 +118,7 @@ class ItemServiceImplTest {
     void createTest() {
         when(userService.findById(1L)).thenReturn(user);
         when(itemRepository.save(item)).thenReturn(item);
+        when(itemRequestRepository.findById(any())).thenReturn(Optional.of(itemRequest));
 
         ItemOutputDto itemOutputDtoTest = itemService.create(1L, itemDto);
 
