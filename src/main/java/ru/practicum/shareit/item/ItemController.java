@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.comments.dto.CommentDto;
-import ru.practicum.shareit.item.dto.ItemInputDto;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemOutputDto;
 import ru.practicum.shareit.item.dto.MarkerItemDto;
 import ru.practicum.shareit.item.service.ItemService;
@@ -33,9 +33,9 @@ public class ItemController {
 
     @PostMapping
     public ItemOutputDto create(@RequestHeader("X-Sharer-User-Id") Long userId,
-                               @Validated(MarkerItemDto.OnCreate.class) @RequestBody ItemInputDto itemInputDto) {
-        log.info("ItemController.create: {} - Started", itemInputDto);
-        ItemOutputDto itemOutputDto = itemService.create(userId, itemInputDto);
+                               @Validated(MarkerItemDto.OnCreate.class) @RequestBody ItemDto itemDto) {
+        log.info("ItemController.create: {} - Started", itemDto);
+        ItemOutputDto itemOutputDto = itemService.create(userId, itemDto);
         log.info("ItemController.create: {} - Finished", itemOutputDto);
         return itemOutputDto;
     }
@@ -43,9 +43,9 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ItemOutputDto update(@RequestHeader("X-Sharer-User-Id") Long userId,
                                @PathVariable("itemId") Long itemId,
-                               @Validated(MarkerItemDto.OnUpdate.class) @RequestBody ItemInputDto itemInputDto) {
-        log.info("ItemController.update: {} {} - Started", itemId, itemInputDto);
-        ItemOutputDto itemOutputDto = itemService.update(userId, itemId, itemInputDto);
+                               @Validated(MarkerItemDto.OnUpdate.class) @RequestBody ItemDto itemDto) {
+        log.info("ItemController.update: {} {} - Started", itemId, itemDto);
+        ItemOutputDto itemOutputDto = itemService.update(userId, itemId, itemDto);
         log.info("ItemController.update: {} - Finished", itemOutputDto);
         return itemOutputDto;
     }

@@ -12,7 +12,8 @@ public class ErrorHandler {
 
     @ExceptionHandler({UserNotFoundException.class,
             ItemNotFoundException.class,
-            BookingNotFoundException.class})
+            BookingNotFoundException.class,
+            ItemRequestNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(final RuntimeException e) {
         return new ErrorResponse(
@@ -29,14 +30,6 @@ public class ErrorHandler {
     public ErrorResponse handleMethodArgumentNotValidException(RuntimeException e) {
         return new ErrorResponse(
                e.getMessage()
-        );
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleDuplicateEmailException(DuplicateEmailException e) {
-        return new ErrorResponse(
-                "Email already exists " + e.getMessage()
         );
     }
 

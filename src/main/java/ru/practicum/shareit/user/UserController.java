@@ -7,12 +7,8 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.MarkerUserDto;
 import ru.practicum.shareit.user.service.UserService;
 
-import javax.validation.Valid;
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Slf4j
 @RestController
 @RequestMapping(path = "/users")
@@ -41,7 +37,9 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public UserDto update(@PathVariable("userId") Long id, @Valid @RequestBody UserDto userDto) {
+    public UserDto update(
+            @PathVariable("userId") Long id,
+            @Validated(MarkerUserDto.OnUpdate.class) @RequestBody UserDto userDto) {
         log.info("UserController.update: {} {} - Started", id, userDto);
         userDto = userService.update(id, userDto);
         log.info("UserController.update: {} - Finished", userDto);

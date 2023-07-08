@@ -2,7 +2,7 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
@@ -49,7 +49,8 @@ public class BookingServiceImpl implements BookingService {
         if (!item.getAvailable()) {
             throw new ItemNotAvailableException("Вещь недоступна");
         }
-        if (bookingDto.getEnd().isBefore(bookingDto.getStart()) || bookingDto.getStart().isEqual(bookingDto.getEnd())) {
+        if (bookingDto.getEnd().isBefore(bookingDto.getStart())
+                || bookingDto.getStart().isEqual(bookingDto.getEnd())) {
             throw new ItemNotAvailableException("Недопустимая длительность аренды");
         }
         Booking booking = bookingRepository.save(BookingMapper.toBooking(bookingDto,
@@ -107,34 +108,36 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getAllBookingsByBooker(Long userId, BookingState state) {
+    public List<Booking> getAllBookingsByBooker(Long userId, BookingState state, Integer from, Integer size) {
         userService.findById(userId);
-
+        PageRequest pageRequest = PageRequest.of(from / size, size);
         List<Booking> bookings;
-        Sort newestFirst = Sort.by(Sort.Direction.DESC, "start");
         switch (state) {
             case ALL: {
-                bookings = bookingRepository.findByBooker_Id(userId, newestFirst);
+                bookings = bookingRepository.findAllByBookerIdOrderByStartDesc(userId, pageRequest);
                 break;
             }
             case PAST: {
-                bookings = bookingRepository.findByBooker_IdAndEndIsBefore(userId, LocalDateTime.now(), newestFirst);
+                bookings = bookingRepository
+                        .findAllByBookerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now(), pageRequest);
                 break;
             }
             case FUTURE: {
-                bookings = bookingRepository.findByBooker_IdAndStartIsAfter(userId, LocalDateTime.now(), newestFirst);
+                bookings = bookingRepository
+                        .findAllByBookerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now(), pageRequest);
                 break;
             }
             case CURRENT: {
-                bookings = bookingRepository.findCurrentForDate(userId, LocalDateTime.now(), newestFirst);
+                bookings = bookingRepository
+                        .findCurrentForDate(userId, LocalDateTime.now(), pageRequest);
                 break;
             }
             case WAITING: {
-                bookings = bookingRepository.findPending(userId, newestFirst);
+                bookings = bookingRepository.findPending(userId, pageRequest);
                 break;
             }
             case REJECTED: {
-                bookings = bookingRepository.findCanceled(userId, newestFirst);
+                bookings = bookingRepository.findCanceled(userId, pageRequest);
                 break;
             }
             case UNSUPPORTED_STATUS:
@@ -146,34 +149,38 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getAllBookingsByOwner(Long userId, BookingState state) {
+    public List<Booking> getAllBookingsByOwner(Long userId, BookingState state, Integer from, Integer size) {
         userService.findById(userId);
-
+        PageRequest pageRequest = PageRequest.of(from / size, size);
         List<Booking> bookings;
-        Sort newestFirst = Sort.by(Sort.Direction.DESC, "start");
         switch (state) {
             case ALL: {
-                bookings = bookingRepository.findByItem_Owner_Id(userId, newestFirst);
+                bookings = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(userId, pageRequest);
                 break;
             }
             case PAST: {
-                bookings = bookingRepository.findByItem_Owner_IdAndEndIsBefore(userId, LocalDateTime.now(), newestFirst);
+                bookings = bookingRepository
+                        .findAllByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now(), pageRequest);
                 break;
             }
             case FUTURE: {
-                bookings = bookingRepository.findByItem_Owner_IdAndStartIsAfter(userId, LocalDateTime.now(), newestFirst);
+                bookings = bookingRepository
+                        .findAllByItemOwnerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now(), pageRequest);
                 break;
             }
             case CURRENT: {
-                bookings = bookingRepository.findOwnerCurrentForDate(userId, LocalDateTime.now(), newestFirst);
+                bookings = bookingRepository
+                        .findOwnerCurrentForDate(userId, LocalDateTime.now(), pageRequest);
                 break;
             }
             case WAITING: {
-                bookings = bookingRepository.findOwnerPending(userId, newestFirst);
+                bookings = bookingRepository
+                        .findOwnerPending(userId, pageRequest);
                 break;
             }
             case REJECTED: {
-                bookings = bookingRepository.findOwnerCanceled(userId, newestFirst);
+                bookings = bookingRepository
+                        .findOwnerCanceled(userId, pageRequest);
                 break;
             }
             case UNSUPPORTED_STATUS:
